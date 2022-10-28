@@ -1,7 +1,24 @@
 module.exports = {
-  extends: ["next", "turbo", "prettier"],
-  rules: {
-    "@next/next/no-html-link-for-pages": "off",
-    "react/jsx-key": "off",
+  parser: `@typescript-eslint/parser`,
+  extends: [
+    `eslint:recommended`,
+    `plugin:react/recommended`,
+    `plugin:prettier/recommended`,
+  ],
+  env: {
+    browser: true,
+    node: true,
+    es2021: true,
   },
-};
+  plugins: [`@typescript-eslint`, `prettier`],
+  rules: {
+    quotes: [`error`, `backtick`],
+  },
+  parserOptions: {
+    requireConfigFile: false,
+    sourceType: `module`,
+    ecmaFeatures: {
+      jsx: true,
+    },
+  },
+}
