@@ -10,7 +10,7 @@ beforeAll(async () => {
   await service.createServer({ port })
 })
 
-describe.only(`stores dependencies and lets you query them`, () => {
+describe(`stores dependencies and lets you query them`, () => {
   test(`Adding a dependency`, async () => {
     console.log(`hi`)
     await client.createDependency({
@@ -151,5 +151,41 @@ describe.only(`stores dependencies and lets you query them`, () => {
     })
     const page = await client.getPreviewPath({ nodeId: `123` })
     expect(page.path).toEqual(`/`)
+  })
+})
+
+describe.only(`client can invalidate nodes`, () => {
+  test(`invalidating a node deletes the node + all dependencies`, async () => {
+    await client.createDependency({
+      // Node is in a different system but the target is only knowable within
+      // the current system.
+      nodeId: `123`,
+      target: {
+        id: `/-header`,
+        type: 0,
+        path: `/`,
+        otherData: true,
+      },
+    })
+
+    await client.createDependency({
+      // Node is in a different system but the target is only knowable within
+      // the current system.
+      nodeId: `123`,
+      target: {
+        id: `/hi-header`,
+        type: 0,
+        path: `/hi`,
+        otherData: true,
+      },
+    })
+    const invalidatedTargets = await client.invalidateNode({
+      nodeId: `123`,
+    })
+    const targetDeps = await client.getTargetDependencies({
+      targetId: `/-header`,
+    })
+    expect(invalidatedTargets).toHaveLength(2)
+    expect(targetDeps).toHaveLength(0)
   })
 })

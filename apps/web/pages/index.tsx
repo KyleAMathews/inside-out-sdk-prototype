@@ -1,5 +1,5 @@
-import { Button } from "ui";
-
+import { Button } from "ui"
+import * as React from "react"
 
 export default function Web() {
   return (
@@ -7,5 +7,5 @@ export default function Web() {
       <h1>Web</h1>
       <Button />
     </div>
-  );
+  )
 }

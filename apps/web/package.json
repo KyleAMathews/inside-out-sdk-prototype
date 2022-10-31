@@ -3,12 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev & npx ts-node@latest -T ./dep-service.ts",
     "build": "next build",
-    "start": "next start",
+    "start": "next start & npx ts-node@latest -T ./dep-service.ts",
     "lint": "next lint"
   },
   "dependencies": {
+    "contentful": "^9.2.9",
     "next": "12.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -16,13 +17,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
-    "eslint-config-custom": "workspace:*",
-    "inside-out": "workspace:*",
-    "eslint": "7.32.0",
-    "next-transpile-modules": "9.0.0",
-    "tsconfig": "workspace:*",
     "@types/node": "^17.0.12",
     "@types/react": "18.0.17",
+    "eslint": "7.32.0",
+    "eslint-config-custom": "workspace:*",
+    "inside-out": "workspace:*",
+    "next-transpile-modules": "9.0.0",
+    "tsconfig": "workspace:*",
     "typescript": "^4.5.3"
   }
 }

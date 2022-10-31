@@ -21,12 +21,12 @@ const targetsTable = `CREATE TABLE IF NOT EXISTS targets(
   path TEXT,
   type INTEGER
 )`
-const nodesDepsTable = `CREATE TABLE nodeDeps(
+const nodesDepsTable = `CREATE TABLE IF NOT EXISTS nodeDeps(
     node_id TEXT NOT NULL,
     target_id TEXT NOT NULL,
     UNIQUE(node_id, target_id)
 )`
-const pathDepsTable = `CREATE TABLE pathDeps(
+const pathDepsTable = `CREATE TABLE IF NOT EXISTS pathDeps(
     node_id TEXT NOT NULL,
     path TEXT NOT NULL,
     UNIQUE(node_id, path)
@@ -62,6 +62,24 @@ export function createDependency({
     insertPathDep.run({ nodeId, path: target.path })
   })
   insert({ nodeId, target })
+}
+
+export function invalidateNode({ nodeId }: { nodeId: string }) {
+  const targets = getNodeDependencies(nodeId)
+  const deleteNode = db.prepare(`DELETE FROM nodes where id = @nodeId`)
+  const deleteNodeDeps = db.prepare(
+    `DELETE FROM nodeDeps where node_id = @nodeId`
+  )
+  const deletePathDep = db.prepare(
+    `DELETE FROM pathDeps where node_id = @nodeId`
+  )
+  const deleteTransaction = db.transaction((nodeId) => {
+    deleteNode.run({ nodeId })
+    deleteNodeDeps.run({ nodeId })
+    deletePathDep.run({ nodeId })
+  })
+  deleteTransaction(nodeId)
+  return targets
 }
 
 /*
@@ -125,6 +143,15 @@ export async function createServer(options) {
     try {
       createDependency(req.body)
       res.send(`ok`)
+    } catch (e) {
+      console.log(e)
+      res.statusCode(500).send(`error`)
+    }
+  })
+  app.post(`/invalidate-node`, (req, res) => {
+    console.log(`body`, req.body)
+    try {
+      res.json(invalidateNode(req.body))
     } catch (e) {
       console.log(e)
       res.statusCode(500).send(`error`)

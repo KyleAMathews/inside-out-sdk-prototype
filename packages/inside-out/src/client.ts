@@ -18,6 +18,21 @@ async function createDependency({
   return result.body
 }
 
+async function invalidateNode({
+  nodeId,
+  clientOptions,
+}: {
+  nodeId: string
+  clientOptions: { port: number }
+}) {
+  const url = new URL(
+    `/invalidate-node`,
+    `http://localhost:${clientOptions.port}`
+  )
+  const result = await got.post(url, { json: { nodeId } }).json()
+  return result
+}
+
 async function getNodeDependencies({ nodeId, clientOptions }) {
   const url = new URL(
     `/node-dependencies`,
@@ -58,6 +73,7 @@ async function getPreviewPath({ nodeId, clientOptions }) {
 export default function client(clientOptions) {
   return {
     createDependency: (args) => createDependency({ ...args, clientOptions }),
+    invalidateNode: (args) => invalidateNode({ ...args, clientOptions }),
     getNodeDependencies: (args) =>
       getNodeDependencies({ ...args, clientOptions }),
     getTargetDependencies: (args) =>
